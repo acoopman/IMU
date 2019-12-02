@@ -1,6 +1,7 @@
 # IMU
 This is the code for my AP CS class and also IB Math HL.
-coopman@coopman-MacBookPro:~/IMU_Aidan_CS_Math/IMU$ ip address
+
+$ ip address
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
