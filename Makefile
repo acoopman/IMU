@@ -1,28 +1,21 @@
-TARGET = imu_plot
-
-SRC = 	cvplot.cpp main.cpp 
-
+TARGET = imu
 INCLUDE = -I./
 
 CC = g++ 
 
-CFLAGS = `pkg-config opencv --cflags` `pkg-config opencv --libs`\
-	-O3 \
-	-Wall \
-
-OBJ = $(patsubst %.cpp,%.o,$(filter %.cpp,$(SRC)))
-
-.SUFFIXES: .cpp .o
+CFLAGS = -O3 -Wall `pkg-config opencv --cflags` 
+LIBS = `pkg-config opencv --libs`
+HDRS = socket.h
+SRCS = 	cvplot.cpp main.cpp socket.cpp
 
 .cpp.o:
-	$(CC) $(CFLAGS) $(DEFINE) $(INCLUDE) -c $< -o $@
 
-all: $(TARGET)
+all: $(TARGET)	
 
 
-$(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(LIB) $(CFLAGS)
+$(TARGET): $(SRCS) $(HDRS)
+	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET) $(LIBS)
 
 clean:
-	rm $(TARGET) $(OBJ)
+	rm -f $(TARGET) 
 
