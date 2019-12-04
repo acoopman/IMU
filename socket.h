@@ -15,7 +15,7 @@
 #include <math.h>
 #include "socket.h"
 
-#define ECHOMAX 255     /* Longest string to echo */
+
 void UseIdleTime();                     /* Function to use idle time */
 void SIGIOHandler(int signalType);      /* Function to handle SIGIO */
 int start_socket();

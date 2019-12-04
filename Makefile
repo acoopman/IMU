@@ -5,8 +5,8 @@ CC = g++
 
 CFLAGS = -O3 -Wall `pkg-config opencv --cflags` 
 LIBS = `pkg-config opencv --libs`
-HDRS = socket.h
-SRCS = 	cvplot.cpp main.cpp socket.cpp
+HDRS = socket.h packet.h
+SRCS = 	cvplot.cpp main.cpp socket.cpp packet.cpp
 
 .cpp.o:
 

@@ -16,6 +16,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include "packet.h"
 
 using namespace cv;
 using namespace std;
@@ -24,52 +25,16 @@ int sock;                        /* Socket -- GLOBAL for signal handler */
 struct sockaddr_in echoServAddr; /* Server address */
 unsigned short echoServPort;     /* Server port */
 struct sigaction handler;        /* Signal handling action definition */
+
+#define ECHOMAX 255     /* Longest string to echo */
 char echoBuffer[ECHOMAX];         /* Datagram buffer */
+
 
 // volatile keyword is a qualifier that is applied to a variable when it is declared.
 // It tells the compiler that the value of the variable may change at any time--without a
 // ny action being taken by the code the compiler finds nearby.
 volatile int packet_count;
 
-
-typedef struct packet
-{
-
-  float time_stamp,acc,ax,ay,az,gyro,gx,gy,gz,mag,mx,my,mz;
-
-
-} packet_t;
-
-
-void extract_packet(packet_t * packet, char * buffer)
-{
-
-  float acc,ax,ay,az,gyro,gx,gy,gz,mag,mx,my,mz;
-  double time_stamp;
-  sscanf(echoBuffer,"%lf,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", 
-  	 &time_stamp,&acc,&ax,&ay,&az,&gyro,&gx,&gy,&gz,&mag,&mx,&my,&mz); 
-
-  packet->time_stamp = time_stamp;
-  packet->gyro = gyro;
-  packet->acc = acc;
-  packet->mag = mag;
-  packet->ax = ax;
-  packet->ay = ay;
-  packet->az = az;
-  packet->gx = gx;
-  packet->gy = gy;
-  packet->gz = gz;
-  packet->mx = mx;
-  packet->my = my;
-  packet->mz = mz;
-	   
-}
-
-void print_packet(packet_t * in)
-{
-  printf("%lf, %f,%f,%f, %f,%f,%f, %f,%f,%f\n",in->time_stamp,in->ax,in->ay,
-	 in->az,in->gx,in->gy,in->gz,in->mx,in->my,in->mz);
-}
 
 int main(int argc, char *argv[])
 {

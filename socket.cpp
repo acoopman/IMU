@@ -1,11 +1,12 @@
 #include "socket.h"
+#include "packet.h"
 
 extern int sock;                        /* Socket -- GLOBAL for signal handler */
 extern struct sockaddr_in echoServAddr; /* Server address */
 extern unsigned short echoServPort;     /* Server port */
 extern struct sigaction handler;        /* Signal handling action definition */
 extern volatile int packet_count;
-extern char echoBuffer[ECHOMAX];         /* Datagram buffer */
+extern char echoBuffer[];         /* Datagram buffer */
 
 int start_socket()
 {
