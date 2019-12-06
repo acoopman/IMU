@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
   const int N = 400;
   float mag_array[N];
-
+  unsigned char samples[N];
   packet_t packets[N];
   
   int previous_packet = 0;
@@ -59,7 +59,10 @@ int main(int argc, char *argv[])
 
   //initialize it to 0
   for(int i = 0; i<N; i++)
-    mag_array[i]=0;
+    {
+      mag_array[i]=0;
+      samples[i] = 0;
+    }
   
   //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
   
@@ -81,12 +84,23 @@ int main(int argc, char *argv[])
 	  print_packet(curr_ptr);
 	  float mag = sqrt((curr_ptr->ax*curr_ptr->ax)+(curr_ptr->ay*curr_ptr->ay)+(curr_ptr->az*curr_ptr->az));
 
+	  //subtract gravity out
+	  mag -= 9.81f;
+	  
 	  //shift over the array to the left to allow new magnitude value
 	  for(int i =0; i < N-1; i++)
 	    mag_array[i] = mag_array[i+1];
 
 	  //put new magnitude value in the array at the end
 	  mag_array[N-1] = mag;
+
+
+	  // PLOT THE OUTPUT
+	  for(int i = 0; i < N-1; i++)
+	    samples[i] = samples[i+1];
+	  samples[N-1] = (int) (10* fabs(mag)) ; //(int)5;
+	  CvPlot::clear("Magnitude");
+	  CvPlot::plot("Magnitude", samples, N);
 	}
       
     } //-----------------------------------------------------
