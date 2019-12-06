@@ -38,51 +38,47 @@ volatile int packet_count;
 
 int main(int argc, char *argv[])
 {
+  const int N = 400;
+  float accel[N];
 
-    int previous_packet = 0;
-    packet_count = 0;
+  packet_t packets[N];
+  
+  int previous_packet = 0;
+  packet_count = 0;
 
-    packet_t packet;
-    
-    // Test for correct number of parameters 
-    if (argc != 2)
+  // Test for correct number of parameters 
+  if (argc != 2)
     {
-        fprintf(stderr,"Usage:  %s <SERVER PORT>\n", argv[0]);
-        exit(1);
+      fprintf(stderr,"Usage:  %s <SERVER PORT>\n", argv[0]);
+      exit(1);
     }
-
-    // get the port
-    echoServPort = atoi(argv[1]);
-    start_socket();
-     
-    //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
-    
-    // do a continous loop and process the samples 
-    // the packets are read in the background 
-    for (;;)
-      {
-	//if we received a packet, than process it
-	if( (packet_count > 0) && (packet_count > previous_packet))
-	  {
-	    previous_packet = packet_count;
-	    printf("We receive a packet #%i \n", packet_count);
-
-	    //handle the packet
-	    // sscanf(echoBuffer,"%lf,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", 
-	    //	   &time_stamp,&acc,&ax,&ay,&az,&gyro,&gx,&gy,&gz,&mag,&mx,&my,&mz); 
-	    
-	    //printf("%lf, %f,%f,%f, %f,%f,%f, %f,%f,%f\n",time_stamp,ax,ay,az,gx,gy,gz,mx,my,mz);
-
-
-           extract_packet(&packet, echoBuffer);
-
-	   print_packet(&packet);
-	   
-	  }
-	
-      } //-----------------------------------------------------
-
-
+  
+  // get the port
+  echoServPort = atoi(argv[1]);
+  start_socket();
+  
+  //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
+  
+  // do a continous loop and process the samples 
+  // the packets are read in the background 
+  for (;;)
+    {
+      //if we received a packet, than process it
+      if( (packet_count > 0) && (packet_count > previous_packet))
+	{
+	  int packet_idx = packet_count%N;
+	  previous_packet = packet_count;
+	  printf("We receive a packet #%i \n", packet_count);
+	  
+	  extract_packet(&packets[packet_idx], echoBuffer);
+	  
+	  print_packet(&packets[packet_idx]);
+	  
+	}
+      
+    } //-----------------------------------------------------
+  
+  
 } // main
 
 
