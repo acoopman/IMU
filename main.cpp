@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
 {
   const int N = 400;
   float mag_array[N];
+  float baseline[N];
   unsigned char samples[N];
+  unsigned char samples2[N];
   packet_t packets[N];
   
   int previous_packet = 0;
@@ -62,12 +64,15 @@ int main(int argc, char *argv[])
     {
       mag_array[i]=0;
       samples[i] = 0;
+      samples2[i] = 0;
+      baseline[i] = 0;
     }
   
   //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
   
   // do a continous loop and process the samples 
   // the packets are read in the background 
+  float baseline_value = 0;
   for (;;)
     {
       //if we received a packet, than process it
@@ -77,11 +82,11 @@ int main(int argc, char *argv[])
 	  previous_packet = packet_count;
 
 	  packet_t* curr_ptr =  &packets[packet_idx];
-	  printf("We receive a packet #%i \n", packet_count);
+	  //printf("We receive a packet #%i \n", packet_count);
 	  
 	  extract_packet(curr_ptr, echoBuffer);
 	  
-	  print_packet(curr_ptr);
+	  //print_packet(curr_ptr);
 	  float mag = sqrt((curr_ptr->ax*curr_ptr->ax)+(curr_ptr->ay*curr_ptr->ay)+(curr_ptr->az*curr_ptr->az));
 
 	  //subtract gravity out
@@ -89,18 +94,32 @@ int main(int argc, char *argv[])
 	  
 	  //shift over the array to the left to allow new magnitude value
 	  for(int i =0; i < N-1; i++)
-	    mag_array[i] = mag_array[i+1];
-
+	    {
+	      mag_array[i] = mag_array[i+1];
+	      baseline[i] = baseline[i+1];
+	    }
 	  //put new magnitude value in the array at the end
 	  mag_array[N-1] = mag;
 
 
+	  // get a baseline
+	  float p = 0.1;
+	  float q = (1-p);
+	  baseline_value = p*mag + q*baseline_value;
+
+	  
 	  // PLOT THE OUTPUT
 	  for(int i = 0; i < N-1; i++)
-	    samples[i] = samples[i+1];
-	  samples[N-1] = (int) (10* fabs(mag)) ; //(int)5;
+	    {
+	      samples[i] = samples[i+1];
+	      samples2[i] = samples2[i+1];
+	    }
+	      samples[N-1] = (int) (10* fabs(mag)) ; //(int)5;
+	      samples2[N-1] = (int) (10* fabs(baseline_value)) ; //(int)5;
+
 	  CvPlot::clear("Magnitude");
 	  CvPlot::plot("Magnitude", samples, N);
+	  CvPlot::plot("Magnitude", samples2, N);
 	}
       
     } //-----------------------------------------------------
