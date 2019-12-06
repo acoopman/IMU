@@ -39,7 +39,7 @@ volatile int packet_count;
 int main(int argc, char *argv[])
 {
   const int N = 400;
-  float accel[N];
+  float mag_array[N];
 
   packet_t packets[N];
   
@@ -56,6 +56,10 @@ int main(int argc, char *argv[])
   // get the port
   echoServPort = atoi(argv[1]);
   start_socket();
+
+  //initialize it to 0
+  for(int i = 0; i<N; i++)
+    mag_array[i]=0;
   
   //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
   
@@ -68,12 +72,21 @@ int main(int argc, char *argv[])
 	{
 	  int packet_idx = packet_count%N;
 	  previous_packet = packet_count;
+
+	  packet_t* curr_ptr =  &packets[packet_idx];
 	  printf("We receive a packet #%i \n", packet_count);
 	  
-	  extract_packet(&packets[packet_idx], echoBuffer);
+	  extract_packet(curr_ptr, echoBuffer);
 	  
-	  print_packet(&packets[packet_idx]);
-	  
+	  print_packet(curr_ptr);
+	  float mag = sqrt((curr_ptr->ax*curr_ptr->ax)+(curr_ptr->ay*curr_ptr->ay)+(curr_ptr->az*curr_ptr->az));
+
+	  //shift over the array to the left to allow new magnitude value
+	  for(int i =0; i < N-1; i++)
+	    mag_array[i] = mag_array[i+1];
+
+	  //put new magnitude value in the array at the end
+	  mag_array[N-1] = mag;
 	}
       
     } //-----------------------------------------------------
