@@ -18,6 +18,9 @@
 #include <iostream>
 #include "packet.h"
 
+
+#include <opencv2/plot.hpp>
+
 using namespace cv;
 using namespace std;
 
@@ -41,8 +44,7 @@ int main(int argc, char *argv[])
   const int N = 400;
   float mag_array[N];
   float baseline[N];
-  unsigned char samples[N];
-  unsigned char samples2[N];
+  float signal[N];
   packet_t packets[N];
   
   int previous_packet = 0;
@@ -62,17 +64,16 @@ int main(int argc, char *argv[])
   //initialize it to 0
   for(int i = 0; i<N; i++)
     {
-      mag_array[i]=0;
-      samples[i] = 0;
-      samples2[i] = 0;
-      baseline[i] = 0;
+      mag_array[i]=9.81;
+      baseline[i] = 9.81;
+      signal[i] = 0;
     }
   
   //    namedWindow( "ORIENTATION", WINDOW_AUTOSIZE );
   
   // do a continous loop and process the samples 
   // the packets are read in the background 
-  float baseline_value = 0;
+  float baseline_value = 9.81;
   for (;;)
     {
       //if we received a packet, than process it
@@ -90,36 +91,44 @@ int main(int argc, char *argv[])
 	  float mag = sqrt((curr_ptr->ax*curr_ptr->ax)+(curr_ptr->ay*curr_ptr->ay)+(curr_ptr->az*curr_ptr->az));
 
 	  //subtract gravity out
-	  mag -= 9.81f;
+	  //	  mag -= 9.81f;
 	  
 	  //shift over the array to the left to allow new magnitude value
 	  for(int i =0; i < N-1; i++)
 	    {
 	      mag_array[i] = mag_array[i+1];
 	      baseline[i] = baseline[i+1];
+	      signal[i] = signal[i+1];
 	    }
 	  //put new magnitude value in the array at the end
 	  mag_array[N-1] = mag;
 
 
 	  // get a baseline
-	  float p = 0.1;
+	  float p = 0.05;
 	  float q = (1-p);
 	  baseline_value = p*mag + q*baseline_value;
+          baseline[N-1] = baseline_value;
 
-	  
-	  // PLOT THE OUTPUT
-	  for(int i = 0; i < N-1; i++)
+	  //set the signal
+	  float signal_value = mag-baseline_value;
+	  signal[N-1] = signal_value;
+
+	  if(abs(signal_value) > 4)
 	    {
-	      samples[i] = samples[i+1];
-	      samples2[i] = samples2[i+1];
+	      cout << "We have a tap\n";
 	    }
-	      samples[N-1] = (int) (10* fabs(mag)) ; //(int)5;
-	      samples2[N-1] = (int) (10* fabs(baseline_value)) ; //(int)5;
-
-	  CvPlot::clear("Magnitude");
-	  CvPlot::plot("Magnitude", samples, N);
-	  CvPlot::plot("Magnitude", samples2, N);
+	  	
+	  if( (packet_count % 10) == 0)
+	    {
+	      //CvPlot::clear("Magnitude");
+	      //CvPlot::clear("Baseline");
+	      CvPlot::clear("Signal");
+	      //CvPlot::plot_float("Magnitude", mag_array, N, 1, 255, 0,   0); //RGB
+	      //CvPlot::plot_float("Baseline", baseline, N, 1,   0, 0, 255); //RGB
+	      CvPlot::plot_float("Signal", signal, N, 1,   0, 0, 255); //RGB
+	      //CvPlot::PlotManger("Magnitude", baseline, N, 1,   0, 0, 255); //RGB
+	    }	  
 	}
       
     } //-----------------------------------------------------
