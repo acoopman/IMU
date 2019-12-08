@@ -442,6 +442,34 @@ void plot(const string figure_name, const T* p, int count, int step,
 	delete [] data_copy;
 }
 
+#if 1
+// plot a new curve, if a figure of the specified figure name already exists,
+// the curve will be plot on that figure; if not, a new figure will be created.
+// static method
+void plot_float(const string figure_name, float * p, int count, int step,
+		  int R, int G, int B)
+{
+	if (step <= 0)
+		step = 1;
+
+	float  *data_copy = new float[count * step];
+
+	float   *dst = data_copy;
+	const float *src = p;
+
+	for (int i = 0; i < count * step; i++)
+	{
+		*dst = (float)(*src);
+		dst++;
+		src++;
+	}
+
+	pm.Plot(figure_name, data_copy, count, step, R, G, B);
+
+	delete [] data_copy;
+}
+#endif  
+
 // delete all plots on a specified figure
 void clear(const string figure_name)
 {

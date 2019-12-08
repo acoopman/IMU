@@ -142,10 +142,13 @@ namespace CvPlot
 	};
 
 	// handle different data types; static mathods;
-
+	void plot_float(const string figure_name, float * in, int count, int step = 1,
+			  int R = -1, int G = -1, int B = -1);
+	
 	template<typename T>
 	void plot(const string figure_name, const T* p, int count, int step = 1,
 			  int R = -1, int G = -1, int B = -1);
+	
 	void clear(const string figure_name);
 
 	
